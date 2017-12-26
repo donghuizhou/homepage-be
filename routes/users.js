@@ -85,15 +85,12 @@ router.put('/logout', (req, res, next) => {
   res.cookie('userId', '', {
     path: '/',
     maxAge: -1
-  })
+  });
   res.json({
     code: 200,
     msg: '退出成功',
     result: ''
-  })
+  });
 })
-
-// logout
-
 
 module.exports = router;
