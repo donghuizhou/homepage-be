@@ -2,6 +2,7 @@ let express = require('express');
 let router = express.Router();
 let fs = require('fs');
 let formidable = require('formidable');
+let Articles = require('./../models/articles')
 
 let resCb = (res, code, msg, result) => {
   return res.json({
@@ -57,6 +58,27 @@ router.post('/uploadImg', (req, res, next) => {
       })
     }
   });
+});
+
+// 获取文章列表
+router.get('/getArticles', (req, res, next) => {
+  let offset = parseInt(req.query.offset),
+      pageSize = parseInt(req.query.page_size),
+      skip = (offset - 1) * pageSize,
+      count = '';
+  Articles.count((err, doc) => {
+    if (err) throw err;
+    count = doc;
+  });
+  Articles.find({}, (err, doc) => {
+    if (err) throw err;
+    res.json({
+      code: 200,
+      msg: '',
+      count: count,
+      result: doc
+    })
+  }).skip(skip).limit(pageSize);    
 });
 
 module.exports = router;

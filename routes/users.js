@@ -63,6 +63,8 @@ router.post('/login', (req, res, next) => {
         pageViews: userDoc.pageViews
       };
       resCb(res, 200, '登录成功', result);
+    } else {
+      resCb(res, 501, '账号或密码错误');
     }
   })
 });
