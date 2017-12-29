@@ -81,4 +81,36 @@ router.get('/getArticles', (req, res, next) => {
   }).skip(skip).limit(pageSize);    
 });
 
+// 查看评论
+router.get('/getComments', (req, res, next) => {
+  let id = req.query.id,
+    offset = parseInt(req.query.offset),
+    pageSize = parseInt(req.query.page_size),
+    skip = (offset - 1) * pageSize,
+    count = '';
+  Articles.find({'_id': id}, (err, doc) => {
+    if (err) throw err;
+    res.json({
+      code: 200,
+      msg: '',
+      count: doc[0].comments.length,
+      result: doc[0].comments.slice(skip, skip + pageSize)
+    });
+  })
+});
+
+// 发布 下线
+router.put('/changeStatus', (req, res, next) => {
+  let id = req.body.id,
+    status = parseInt(req.body.status);
+  Articles.update({'_id': id}, {$set: {'status': status}}, (err, doc) => {
+    if (err) throw err;
+    res.json({
+      code: 200,
+      msg: status == 1 ? '发布成功' : status == 0 ? '下线成功' : '',
+      result: ''
+    });
+  });  
+});
+
 module.exports = router;
