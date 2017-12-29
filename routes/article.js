@@ -66,11 +66,11 @@ router.get('/getArticles', (req, res, next) => {
       pageSize = parseInt(req.query.page_size),
       skip = (offset - 1) * pageSize,
       count = '';
-  Articles.count((err, doc) => {
+  Articles.count({'del': {$eq: 0}},(err, doc) => {
     if (err) throw err;
     count = doc;
   });
-  Articles.find({}, (err, doc) => {
+  Articles.find({'del': {$eq: 0}}, (err, doc) => {
     if (err) throw err;
     res.json({
       code: 200,
@@ -113,4 +113,16 @@ router.put('/changeStatus', (req, res, next) => {
   });  
 });
 
+// 删除文章
+router.delete('/delArticle', (req, res, next) => {
+  let id = req.query.id;
+  Articles.update({'_id': id}, {$set: {'del': 99}}, (err, doc) => {
+    if (err) throw err;
+    res.json({
+      code: 200,
+      msg: '删除成功',
+      result: ''
+    })
+  })
+});
 module.exports = router;

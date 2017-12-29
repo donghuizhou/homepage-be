@@ -16,7 +16,8 @@ let articleSchema = new mongoose.Schema({
       "time": Number
     }
   ],
-  "status": Number
+  "status": Number,
+  "del": Number
 });
 
 // 模型输出 
