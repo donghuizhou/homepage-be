@@ -2,7 +2,8 @@ let express = require('express');
 let router = express.Router();
 let fs = require('fs');
 let formidable = require('formidable');
-let Articles = require('./../models/articles')
+let Articles = require('./../models/articles');
+let Categories = require('./../models/categories');
 
 let resCb = (res, code, msg, result) => {
   return res.json({
@@ -125,4 +126,17 @@ router.delete('/delArticle', (req, res, next) => {
     })
   })
 });
+
+// 获取分类
+router.get('/getCategories', (req, res, next) => {
+  Categories.find((err, doc) => {
+    if (err) throw err;
+    res.json({
+      code: 200,
+      msg: '',
+      result: doc
+    })
+  });
+});
+
 module.exports = router;
