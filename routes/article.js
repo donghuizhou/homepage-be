@@ -79,7 +79,7 @@ router.get('/getArticles', (req, res, next) => {
       count: count,
       result: doc
     })
-  }).skip(skip).limit(pageSize);    
+  }).sort({'createTime': -1}).skip(skip).limit(pageSize);    
 });
 
 // 查看评论
@@ -136,6 +136,37 @@ router.get('/getCategories', (req, res, next) => {
       msg: '',
       result: doc
     })
+  });
+});
+
+// 创建文章
+router.post('/createArticle', (req, res, next) => {
+  let mdContent = req.body.mdContent,
+    radomNum = parseInt(Math.random() * 9000 + 1000),
+    createTime = Date.parse(new Date) / 1000,
+    articleId = parseInt(`${radomNum}${createTime}`),
+    // 文件保存路径
+    filePath = `${process.cwd()}/public/articles/${articleId}.md`;
+    data = {
+      author: req.body.author,
+      title: req.body.title,
+      articlePath: `/artilces/${articleId}.md`,
+      createTime,
+      tags: req.body.tags,
+      category: req.body.cate,
+      status: req.body.status,
+      del: 0,
+      readingAmounts: 0,
+      comments: [],
+      articleId
+    };
+  // 写入文件
+  fs.writeFile(filePath, mdContent, { encoding: 'utf-8' }, err => {
+    if (err) throw err;
+    Articles.create(data, (err, doc) => {
+      if (err) throw err;
+      resCb(res, 200, '保存成功');
+    });
   });
 });
 
