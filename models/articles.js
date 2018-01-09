@@ -2,7 +2,6 @@ let mongoose = require('mongoose');
 
 // 定义模型
 let articleSchema = new mongoose.Schema({
-  "articleId": Number,
   "author": String,
   "title": String,
   "articlePath": String,
