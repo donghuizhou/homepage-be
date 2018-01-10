@@ -55,14 +55,25 @@ router.post('/login', (req, res, next) => {
         path: '/',
         maxAge: 1000 * 60 * 60 * 24
       });
-      let result = {
-        userName: userDoc.userName,
-        nickName: userDoc.nickName,
-        lastLoginIP: userDoc.lastLoginIP,
-        lastLoginTime: userDoc.lastLoginTime,
-        pageViews: userDoc.pageViews
+      // 登录ip 登陆时间
+      let data = {
+        lastLoginTime: parseInt(Date.parse(new Date()) / 1000),
+        lastLoginIP: req.connection.remoteAddress
       };
-      resCb(res, 200, '登录成功', result);
+      User.update({'userId': userDoc.userId}, {$set: data}, (err, doc) => {
+        if (err) throw err;
+        User.findOne({'userId': userDoc.userId}, (err, doc2) => {
+          if (err) throw err;
+          let result = {
+            userName: doc2.userName,
+            nickName: doc2.nickName,
+            lastLoginIP: doc2.lastLoginIP,
+            lastLoginTime: doc2.lastLoginTime,
+            pageViews: doc2.pageViews
+          };
+          resCb(res, 200, '登录成功', result);
+        });
+      });  
     } else {
       resCb(res, 501, '账号或密码错误');
     }

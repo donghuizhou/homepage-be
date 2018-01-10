@@ -95,21 +95,22 @@ router.get('/getCategories', (req, res, next) => {
 router.post('/createArticle', (req, res, next) => {
   let mdContent = req.body.mdContent,
     radomNum = parseInt(Math.random() * 9000 + 1000),
-    createTime = Date.parse(new Date) / 1000,
+    createTime = parseInt(Date.parse(new Date()) / 1000),
     fileName = parseInt(`${radomNum}${createTime}`),
     // 文件保存路径
     filePath = `${process.cwd()}/public/articles/${fileName}.md`;
     data = {
       author: req.body.author,
       title: req.body.title,
-      articlePath: `/artilces/${fileName}.md`,
+      articlePath: `/articles/${fileName}.md`,
       createTime,
       tags: req.body.tags,
       category: req.body.cate,
       status: req.body.status,
       del: 0,
       readingAmounts: 0,
-      comments: []
+      comments: [],
+      updateTime: createTime
     };
   // 写入文件
   fs.writeFile(filePath, mdContent, { encoding: 'utf-8' }, err => {
@@ -169,6 +170,33 @@ router.get('/previewArticle', (req, res, next) => {
           article: doc[0]
         }
       })
+    });
+  });
+});
+
+// 编辑文章
+router.put('/editArticle', (req, res, next) => {
+  let id = req.body.id,
+    content = req.body.mdContent;
+  Articles.find({'_id': id}, (err, doc) => {
+    if (err) throw err;
+    let filePath = `${process.cwd()}/public${doc[0].articlePath}`,
+      // 修改时间
+      updateTime = parseInt(Date.parse(new Date()) / 1000);
+    fs.writeFile(filePath, content, { encoding: 'utf-8' }, err => {
+      if (err) throw err;
+      let data = {
+        title: req.body.title,
+        author: req.body.author,
+        category: req.body.cate,
+        status: req.body.status,
+        tags: req.body.tags,
+        updateTime
+      };
+      Articles.update({'_id': id}, {$set: data}, (err, doc2) => {
+        if (err) throw err;
+        resCb(res, 200, 'success');
+      });
     });
   });
 });
